@@ -102,34 +102,41 @@ var getRandomItems = function(arr) {
 };
 
 var items = [];
+var createItemsArray = function() {
 
-for (var i=0; i<26; i++) {
+  for (var i=0; i<26; i++) {
 
-  var nameRand = getRandomInt(0, (names.length - 1));
-  var picRandIndex = getRandomInt(0, (pictures.length - 1));
-  var picRand = 'img/cards/' + pictures[picRandIndex] + '.jpg';
+    var nameRand = getRandomInt(0, (names.length - 1));
+    var picRandIndex = getRandomInt(0, (pictures.length - 1));
+    var picRand = 'img/cards/' + pictures[picRandIndex] + '.jpg';
 
-  var item = {
-    name: names[nameRand],
-    picture: picRand,
-    amount: getRandomInt(0, 21),
-    price: getRandomInt(100, 1500),
-    weight: getRandomInt(30, 300),
-    rating: {
-      value: getRandomInt(1, 5),
-      number: getRandomInt(10, 900)
-    },
-    nutritionFacts: {
-      sugar: getRandomBool(),
-      energy: getRandomInt(700, 500),
-      contents: getRandomItems(contents)
-    }
-  };
+    var item = {
+      name: names[nameRand],
+      picture: picRand,
+      amount: getRandomInt(0, 21),
+      price: getRandomInt(100, 1500),
+      weight: getRandomInt(30, 300),
+      rating: {
+        value: getRandomInt(1, 5),
+        number: getRandomInt(10, 900)
+      },
+      nutritionFacts: {
+        sugar: getRandomBool(),
+        energy: getRandomInt(700, 500),
+        contents: getRandomItems(contents)
+      }
+    };
 
-  names.splice(nameRand,1);
-  pictures.splice(picRandIndex,1);
-  items.push(item);
-}
+    names.splice(nameRand,1);
+    pictures.splice(picRandIndex,1);
+    items.push(item);
+  }
+
+  return items;
+};
+
+createItemsArray();
+
 
 // Классы
 
