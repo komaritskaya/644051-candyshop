@@ -83,28 +83,37 @@ var contents = [
   'виллабаджо'
 ];
 
-var getRandomInt = function(min, max) {
+var classCatalogCards = document.querySelector('.catalog__cards');
+var classCatalogLoad = document.querySelector('.catalog__load');
+var classGoodsCardEmpty = document.querySelector('.goods__card-empty');
+var templateCard = document.querySelector('#card').content.querySelector('article');
+var templateCardOrder = document.querySelector('#card-order').content.querySelector('article');
+var classGoodsCards = document.querySelector('.goods__cards');
+
+function getRandomInt (min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+}
 
-var getRandomBool = function() {
+function getRandomBool () {
   return Math.random() < 0.5;
-};
+}
 
-var getRandomItems = function(arr) {
+function getRandomItems (arr) {
   var newArr = [];
-  for (var i=0; i<arr.length; i++) {
+  for (var i = 0; i < arr.length; i++) {
     if (getRandomBool()) {
       newArr.push(arr[i]);
     }
   }
+
   return newArr;
-};
+}
 
-var items = [];
-var createItemsArray = function() {
+// Формирование массива
 
-  for (var i=0; i<26; i++) {
+function createItemsArray () {
+  var items = [];
+  for (var i = 0; i < 26; i++) {
 
     var nameRand = getRandomInt(0, (names.length - 1));
     var picRandIndex = getRandomInt(0, (pictures.length - 1));
@@ -127,38 +136,28 @@ var createItemsArray = function() {
       }
     };
 
-    names.splice(nameRand,1);
-    pictures.splice(picRandIndex,1);
+    names.splice(nameRand, 1);
+    pictures.splice(picRandIndex, 1);
     items.push(item);
   }
 
   return items;
-};
+}
 
-createItemsArray();
-
-
-// Классы
-
-var classCatalogCards = document.querySelector('.catalog__cards');
-var classCatalogLoad = document.querySelector('.catalog__load');
-var classGoodsCardEmpty = document.querySelector('.goods__card-empty');
+var items = createItemsArray();
 
 // Добавление
 
 classCatalogCards.classList.remove('catalog__cards--load');
 classCatalogLoad.classList.add('visually-hidden');
 
-var templateCard = document.querySelector('#card').content.querySelector('article');
-var fragment = document.createDocumentFragment();
-
-var createCard = function() {
-  for (var i=0; i<items.length; i++) {
+function createCard () {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < items.length; i++) {
     var element = templateCard.cloneNode(true);
     var classCardTitle = element.querySelector('.card__title');
     var classCardImg = element.querySelector('.card__img');
     var classCardPrice = element.querySelector('.card__price');
-    var classCardWeight = element.querySelector('.card__weight');
     var classStarsRating = element.querySelector('.stars__rating');
     var classStarCount = element.querySelector('.star__count');
     var classCardCompositionList = element.querySelector('.card__composition-list');
@@ -172,7 +171,7 @@ var createCard = function() {
     classStarCount.textContent = '(' + items[i].rating.number + ')';
 
     var starStrings = ['one', 'two', 'three', 'four', 'five'];
-    var starIndex = starStrings[items[i].rating.value-1];
+    var starIndex = starStrings[items[i].rating.value - 1];
 
     classStarsRating.classList.remove('stars__rating--five');
     classStarsRating.classList.add('stars__rating--' + starIndex);
@@ -182,7 +181,7 @@ var createCard = function() {
     classCardCharacteristic.textContent = isSugar + '. ' + items[i].nutritionFacts.energy + ' ккал';
     classCardCompositionList.textContent = items[i].nutritionFacts.contents;
 
-    if (items[i].amount == 0) {
+    if (items[i].amount === 0) {
       element.classList.remove('card--in-stock');
       element.classList.add('card--soon');
     } else if (items[i].amount <= 5) {
@@ -192,38 +191,53 @@ var createCard = function() {
 
     fragment.appendChild(element);
   }
-};
 
-createCard();
-classCatalogCards.appendChild(fragment);
+  return fragment;
+}
 
-var templateCardOrder = document.querySelector('#card-order').content.querySelector('article');
-var classGoodsCards = document.querySelector('.goods__cards');
+var cards = createCard();
+classCatalogCards.appendChild(cards);
 
-var selectedItems = [];
-
-var createOrderCard = function() {
-  for (var j=0; j<3; j++) {
-    var i = getRandomInt(0, (items.length - 1));
-    selectedItems[j] = items[i];
-    items.splice(i, 1);
-
-    var element = templateCardOrder.cloneNode(true);
-    var classCardTitle = element.querySelector('.card-order__title');
-    var classCardImg = element.querySelector('.card-order__img');
-    var classCardPrice = element.querySelector('.card-order__price');
-
-    classCardTitle.textContent = selectedItems[j].name;
-    classCardImg.src = selectedItems[j].picture;
-    classCardImg.alt = selectedItems[j].name;
-    classCardPrice.textContent = selectedItems[j].price + ' ₽';
-
-    fragment.appendChild(element);
+function getOrderItems (items) {
+  var copyItems =items.slice();
+  var selectedItems = [];
+  for (var i = 0; i < 3; i++) {
+    var randomIndex = getRandomInt(0, (items.length - 1));
+    selectedItems[i] = copyItems[randomIndex];
+    copyItems.splice(randomIndex, 1);
   }
-};
 
-createOrderCard();
-classGoodsCards.appendChild(fragment);
+  return selectedItems;
+}
+
+var orderCardsInfo = getOrderItems(items);
+
+function createOrderCard (data) {
+  var element = templateCardOrder.cloneNode(true);
+  var classCardTitle = element.querySelector('.card-order__title');
+  var classCardImg = element.querySelector('.card-order__img');
+  var classCardPrice = element.querySelector('.card-order__price');
+
+  classCardTitle.textContent = data.name;
+  classCardImg.src = data.picture;
+  classCardImg.alt = data.name;
+  classCardPrice.textContent = data.price + ' ₽';
+
+  return element;
+}
+
+function createOrderCards (selectedItems) {
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < selectedItems.length; i++) {
+    var orderCard =createOrderCard(selectedItems[i]);
+    fragment.appendChild(orderCard);
+  }
+
+  return fragment;
+}
+
+var orderCards = createOrderCards(orderCardsInfo);
+classGoodsCards.appendChild(orderCards);
 
 classGoodsCards.classList.remove('goods__cards--empty');
 classGoodsCardEmpty.classList.add('visually-hidden');
