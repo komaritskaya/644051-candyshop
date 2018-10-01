@@ -198,9 +198,10 @@ function createCard () {
 var cards = createCard();
 classCatalogCards.appendChild(cards);
 
+
 function getOrderItems (items) {
-  var copyItems =items.slice();
   var selectedItems = [];
+  var copyItems =items.slice();
   for (var i = 0; i < 3; i++) {
     var randomIndex = getRandomInt(0, (items.length - 1));
     selectedItems[i] = copyItems[randomIndex];
@@ -229,7 +230,7 @@ function createOrderCard (data) {
 function createOrderCards (selectedItems) {
   var fragment = document.createDocumentFragment();
   for (var i = 0; i < selectedItems.length; i++) {
-    var orderCard =createOrderCard(selectedItems[i]);
+    var orderCard = createOrderCard(selectedItems[i]);
     fragment.appendChild(orderCard);
   }
 
@@ -241,4 +242,59 @@ classGoodsCards.appendChild(orderCards);
 
 classGoodsCards.classList.remove('goods__cards--empty');
 classGoodsCardEmpty.classList.add('visually-hidden');
+
+// Добавление товара в избранное
+
+var buttonFavoriteList = document.querySelectorAll('.card__btn-favorite');
+
+var buttonFavoriteToggler = function (evt) {
+  var button = evt.target;
+  button.classList.toggle('card__btn-favorite--selected');
+};
+
+for (var i = 0; i < buttonFavoriteList.length; i++) {
+  buttonFavoriteList[i].addEventListener('click', buttonFavoriteToggler);
+}
+
+// Добавление товара в корзину
+
+var buttonAddToCartList = document.querySelectorAll('.card__btn');
+var cardsList = document.querySelectorAll('.card');
+
+var cardOrderHandler = function (evt) {
+  evt.preventDefault();
+  var button = evt.target;
+  var card = evt.currentTarget;
+  if (button.classList.contains('card__btn')) {
+    if (card.classList.contains('card--soon')) {
+      return;
+    } else {
+      var selectedName = card.querySelector('.card__title').textContent;
+      items.forEach ( function (item) {
+        if (selectedName === item.name) {
+          item.amount -= 1;
+          if (item.amount === 0) {
+            card.classList.remove('card--in-stock');
+            card.classList.add('card--soon');
+          } else if (item.amount <= 5) {
+            card.classList.remove('card--in-stock');
+            card.classList.add('card--little');
+          }
+          var newOrder = createOrderCard(item);
+          classGoodsCards.appendChild(newOrder);
+        }
+      });
+    }
+  }
+};
+
+cardsList.forEach (function (card) {
+  card.addEventListener('click', cardOrderHandler)
+});
+
+
+
+
+
+
 
